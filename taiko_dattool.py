@@ -7,7 +7,7 @@ class taiko_dattool:
 	def __init__():
 		self.var = 0
 
-	def decode(file, mode):
+	def decode(file, mode, specialmode):
 		#mode 0 musicinfo mode
 		#mode 1 songinfo mode
 		strings = {}
@@ -34,7 +34,10 @@ class taiko_dattool:
 					values = struct.unpack('i', byteread[0:4]) # 8 bytes of mystery data
 					print("mystery data "+str(byteread[4:12]))
 				elif mode == 1:
-					byteread = f.read(64) # 40 bytes of mystery data
+					bytestoread = 64
+					if specialmode:
+						bytestoread+=4
+					byteread = f.read(bytestoread) # 40 bytes of mystery data
 					values = struct.unpack('ii', byteread[0:8])
 					stringOffset = values[1]
 				print(values)
@@ -81,11 +84,14 @@ class taiko_dattool:
 		print(strings)
 
 filename = sys.argv[1]
+specialmode = False
+if len(sys.argv) > 2:
+	specialmode = True
 modeswitch = filename.split("/")[-1]
-mode = None
-print(modeswitch)
-if modeswitch == "MusicInfo.dat":
+mode = 0
+if modeswitch == "MusicInfo.dat": # it seems the data format changes per input file
+								# 	without changes in the header
 	mode = 0
 elif modeswitch == "SongInfo.dat":
 	mode = 1
-taiko_dattool.decode(filename, mode)
+taiko_dattool.decode(filename, mode, specialmode) # specialmode is for ao/aka ban files which contain more padding for some reason
