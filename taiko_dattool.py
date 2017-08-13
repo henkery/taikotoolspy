@@ -30,14 +30,17 @@ class taiko_dattool:
 			while i < entries:
 				print("attempting to read entry "+str(i))
 				if mode == 0:
-					values = struct.unpack('iii', f.read(12))
+					byteread = f.read(12)
+					values = struct.unpack('i', byteread[0:4]) # 8 bytes of mystery data
+					print("mystery data "+str(byteread[4:12]))
 				elif mode == 1:
 					byteread = f.read(64) # 40 bytes of mystery data
 					values = struct.unpack('ii', byteread[0:8])
+					stringOffset = values[1]
 				print(values)
 				i+=1
 				keyOffset = values[0]
-				stringOffset = values[1]
+				
 				#unk3 = values[2]
 				curOffset = f.tell()
 
@@ -77,4 +80,12 @@ class taiko_dattool:
 				strings[mainkey][key1] = string1
 		print(strings)
 
-taiko_dattool.decode("/mnt/yukari/Mai Torrent/Tested/Taiko no Tatsujin V/PCSG00551/_data/system/MusicInfo.dat", 0)
+filename = sys.argv[1]
+modeswitch = filename.split("/")[-1]
+mode = None
+print(modeswitch)
+if modeswitch == "MusicInfo.dat":
+	mode = 0
+elif modeswitch == "SongInfo.dat":
+	mode = 1
+taiko_dattool.decode(filename, mode)
