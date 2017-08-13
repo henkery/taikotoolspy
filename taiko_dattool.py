@@ -38,7 +38,7 @@ class taiko_dattool:
 					if specialmode:
 						bytestoread+=4
 					byteread = f.read(bytestoread) # 40 bytes of mystery data
-					values = struct.unpack('ii', byteread[0:8])
+					values = struct.unpack('iiiiii', byteread[0:24])
 					stringOffset = values[1]
 				print(values)
 				i+=1
